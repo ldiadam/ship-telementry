@@ -7,16 +7,16 @@ services:
       dockerfile: Dockerfile
     container_name: vessel-telemetry-api-prod
     ports:
-      - "8080:8080"
+      - "31180:31180"
     environment:
-      - PORT=8080
+      - PORT=31180
       - DB_PATH=/app/data/telemetry.db
       - ALLOW_UNSAFE_DUPLICATE_INGEST=false
     volumes:
       # Use named volume for production data persistence
       - vessel-data:/app/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:31180/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -44,9 +44,9 @@ if %ERRORLEVEL% equ 0 (
         
         echo.
         echo ✅ Container started successfully!
-        echo 📍 API available at: http://localhost:8080
-        echo 🏥 Health check: http://localhost:8080/healthz
-        echo 📊 Dashboard: http://localhost:8080/dashboard.html
+        echo 📍 API available at: http://localhost:31180
+        echo 🏥 Health check: http://localhost:31180/healthz
+        echo 📊 Dashboard: http://localhost:31180/dashboard.html
         echo.
         echo 📋 Useful commands:
         echo   docker-compose logs -f    # View logs

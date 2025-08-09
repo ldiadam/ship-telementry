@@ -57,14 +57,14 @@ RUN mkdir -p /app/data && \
 USER appuser
 
 # Expose port
-EXPOSE 8080
+EXPOSE 31180
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/healthz || exit 1
+    CMD curl -f http://localhost:31180/healthz || exit 1
 
 # Set environment variables
-ENV PORT=8080
+ENV PORT=31180
 ENV DB_PATH=/app/data/telemetry.db
 
 # Run the application

@@ -49,9 +49,9 @@ if [ $? -eq 0 ]; then
         
         echo ""
         echo -e "${GREEN}✅ Container started successfully!${NC}"
-        echo -e "${YELLOW}📍 API available at: http://localhost:8080${NC}"
-        echo -e "${YELLOW}🏥 Health check: http://localhost:8080/healthz${NC}"
-        echo -e "${YELLOW}📊 Dashboard: http://localhost:8080/dashboard.html${NC}"
+        echo -e "${YELLOW}📍 API available at: http://localhost:31180${NC}"
+        echo -e "${YELLOW}🏥 Health check: http://localhost:31180/healthz${NC}"
+        echo -e "${YELLOW}📊 Dashboard: http://localhost:31180/dashboard.html${NC}"
         echo ""
         echo -e "${BLUE}📋 Useful commands:${NC}"
         echo "  docker-compose logs -f    # View logs"

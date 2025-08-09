@@ -5,9 +5,9 @@ services:
     build: .
     container_name: vessel-telemetry-api
     ports:
-      - "8080:8080"
+      - "31180:31180"
     environment:
-      - PORT=8080
+      - PORT=31180
       - DB_PATH=/app/data/telemetry.db
       - ALLOW_UNSAFE_DUPLICATE_INGEST=false
     volumes:
@@ -18,7 +18,7 @@ services:
       - ./ship_telemetry_extended.xlsx:/app/ship_telemetry_extended.xlsx:ro
       - ./ship_telemetry_extended_2.xlsx:/app/ship_telemetry_extended_2.xlsx:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:31180/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
