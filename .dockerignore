@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Development files
+.vscode/
+.idea/
+*.log
+
+# Test files
+*_test.go
+test_data/
+
+# Build artifacts
+main
+*.exe
+tmp/
+
+# Data files (will be mounted as volume)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Sample files (optional - remove if you want them in container)
+*.xlsx
+sample_*
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db

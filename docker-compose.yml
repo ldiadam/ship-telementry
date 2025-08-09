@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  vessel-telemetry:
+    build: .
+    container_name: vessel-telemetry-api
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/telemetry.db
+      - ALLOW_UNSAFE_DUPLICATE_INGEST=false
+    volumes:
+      # Mount data directory for persistent storage
+      - ./data:/app/data
+      # Optional: Mount sample files for testing
+      - ./sample_telemetry.xlsx:/app/sample_telemetry.xlsx:ro
+      - ./ship_telemetry_extended.xlsx:/app/ship_telemetry_extended.xlsx:ro
+      - ./ship_telemetry_extended_2.xlsx:/app/ship_telemetry_extended_2.xlsx:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - vessel-network
+
+  # Optional: Add a reverse proxy for production
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: vessel-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - vessel-telemetry
+  #   networks:
+  #     - vessel-network
+
+networks:
+  vessel-network:
+    driver: bridge
+
+volumes:
+  vessel-data:
+    driver: local
