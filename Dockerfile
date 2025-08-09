@@ -38,6 +38,17 @@ COPY --from=builder /app/main .
 # Copy web assets
 COPY --from=builder /app/web ./web
 
+# Copy schema files
+COPY --from=builder /app/schema ./schema
+
+# Debug: List contents to verify files are copied
+RUN echo "=== Debugging file structure ===" && \
+    ls -la /app/ && \
+    echo "=== Schema directory ===" && \
+    ls -la /app/schema/ && \
+    echo "=== Schema file content ===" && \
+    head -10 /app/schema/schema.sql
+
 # Create data directory and set permissions
 RUN mkdir -p /app/data && \
     chown -R appuser:appgroup /app
