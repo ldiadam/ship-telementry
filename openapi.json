@@ -1,0 +1,543 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vessel Telemetry API",
+    "version": "1.0.0",
+    "description": "API for ingesting and retrieving vessel telemetry data from XLSX files"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/ingest/xlsx": {
+      "post": {
+        "summary": "Ingest XLSX telemetry file",
+        "description": "Upload and process an XLSX file containing vessel telemetry data",
+        "parameters": [
+          {
+            "name": "imo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IMO number of the vessel (preferred identifier)"
+          },
+          {
+            "name": "vessel_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the vessel (fallback if IMO unknown)"
+          },
+          {
+            "name": "period_start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "ISO 8601 timestamp for batch period start"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "XLSX file to upload"
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing parameters"
+          },
+          "409": {
+            "description": "File already ingested"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/vessels": {
+      "get": {
+        "summary": "List all vessels",
+        "description": "Get a list of all vessels with their latest telemetry timestamps",
+        "responses": {
+          "200": {
+            "description": "List of vessels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VesselWithLatest"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vessels/{id}": {
+      "get": {
+        "summary": "Get vessel details",
+        "description": "Get detailed information about a specific vessel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vessel details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VesselWithLatest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vessel not found"
+          }
+        }
+      }
+    },
+    "/vessels/{id}/telemetry": {
+      "get": {
+        "summary": "Get vessel telemetry data",
+        "description": "Retrieve paginated telemetry data for a specific vessel and stream",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "stream",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["engines", "fuel", "generators", "cctv", "impact", "location"]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 200
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor (base64 encoded)"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "engine_no",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by engine number (engines stream only)"
+          },
+          {
+            "name": "tank_no",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by tank number (fuel stream only)"
+          },
+          {
+            "name": "gen_no",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by generator number (generators stream only)"
+          },
+          {
+            "name": "cam_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by camera ID (cctv stream only)"
+          },
+          {
+            "name": "sensor_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by sensor ID (impact stream only)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated telemetry data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid parameters"
+          },
+          "404": {
+            "description": "Vessel not found"
+          }
+        }
+      }
+    },
+    "/vessels/{id}/latest": {
+      "get": {
+        "summary": "Get latest telemetry reading",
+        "description": "Get the most recent telemetry reading for a vessel and stream",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "stream",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["engines"]
+            }
+          },
+          {
+            "name": "engine_no",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest reading",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {"$ref": "#/components/schemas/EngineReading"}
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No data found"
+          }
+        }
+      }
+    },
+    "/uploads/{id}": {
+      "get": {
+        "summary": "Get upload details",
+        "description": "Get information about a specific file upload",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Upload"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Upload not found"
+          }
+        }
+      }
+    },
+    "/.well-known/openapi.json": {
+      "get": {
+        "summary": "Get OpenAPI specification",
+        "description": "Returns the OpenAPI specification for this API",
+        "responses": {
+          "200": {
+            "description": "OpenAPI specification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Vessel": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "imo": {"type": "string", "nullable": true},
+          "name": {"type": "string"},
+          "flag": {"type": "string", "nullable": true},
+          "type": {"type": "string", "nullable": true},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "VesselWithLatest": {
+        "allOf": [
+          {"$ref": "#/components/schemas/Vessel"},
+          {
+            "type": "object",
+            "properties": {
+              "latest": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Upload": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "source_filename": {"type": "string"},
+          "file_hash": {"type": "string"},
+          "uploaded_at": {"type": "string", "format": "date-time"},
+          "note": {"type": "string", "nullable": true}
+        }
+      },
+      "EngineReading": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "engine_no": {"type": "integer", "nullable": true},
+          "ts": {"type": "string", "format": "date-time"},
+          "rpm": {"type": "number", "nullable": true},
+          "temp_c": {"type": "number", "nullable": true},
+          "oil_pressure_bar": {"type": "number", "nullable": true},
+          "alarms": {"type": "string", "nullable": true},
+          "row_hash": {"type": "string"},
+          "extra_json": {"type": "object"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "FuelTankReading": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "tank_no": {"type": "integer", "nullable": true},
+          "ts": {"type": "string", "format": "date-time"},
+          "level_percent": {"type": "number", "nullable": true},
+          "volume_liters": {"type": "number", "nullable": true},
+          "temp_c": {"type": "number", "nullable": true},
+          "row_hash": {"type": "string"},
+          "extra_json": {"type": "object"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "GeneratorReading": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "gen_no": {"type": "integer", "nullable": true},
+          "ts": {"type": "string", "format": "date-time"},
+          "load_kw": {"type": "number", "nullable": true},
+          "voltage_v": {"type": "number", "nullable": true},
+          "frequency_hz": {"type": "number", "nullable": true},
+          "fuel_rate_lph": {"type": "number", "nullable": true},
+          "row_hash": {"type": "string"},
+          "extra_json": {"type": "object"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CCTVStatusReading": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "cam_id": {"type": "string", "nullable": true},
+          "ts": {"type": "string", "format": "date-time"},
+          "status": {"type": "string", "nullable": true},
+          "uptime_percent": {"type": "number", "nullable": true},
+          "row_hash": {"type": "string"},
+          "extra_json": {"type": "object"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "ImpactVibrationReading": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "sensor_id": {"type": "string", "nullable": true},
+          "ts": {"type": "string", "format": "date-time"},
+          "accel_g": {"type": "number", "nullable": true},
+          "shock_g": {"type": "number", "nullable": true},
+          "notes": {"type": "string", "nullable": true},
+          "row_hash": {"type": "string"},
+          "extra_json": {"type": "object"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "LocationReading": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "format": "int64"},
+          "vessel_id": {"type": "integer", "format": "int64"},
+          "ts": {"type": "string", "format": "date-time"},
+          "latitude": {"type": "number", "nullable": true, "minimum": -90, "maximum": 90},
+          "longitude": {"type": "number", "nullable": true, "minimum": -180, "maximum": 180},
+          "course_degrees": {"type": "number", "nullable": true, "minimum": 0, "maximum": 360},
+          "speed_knots": {"type": "number", "nullable": true, "minimum": 0},
+          "status": {"type": "string", "nullable": true},
+          "row_hash": {"type": "string"},
+          "extra_json": {"type": "object"},
+          "created_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "IngestResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ingested", "already_ingested"]
+          },
+          "upload_id": {"type": "integer", "format": "int64", "nullable": true},
+          "vessel_id": {"type": "integer", "format": "int64", "nullable": true},
+          "rows_inserted": {
+            "type": "object",
+            "properties": {
+              "engines": {"type": "integer"},
+              "fuel": {"type": "integer"},
+              "generators": {"type": "integer"},
+              "cctv": {"type": "integer"},
+              "impact": {"type": "integer"},
+              "location": {"type": "integer"}
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      },
+      "PaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {"$ref": "#/components/schemas/EngineReading"},
+                {"$ref": "#/components/schemas/FuelTankReading"},
+                {"$ref": "#/components/schemas/GeneratorReading"},
+                {"$ref": "#/components/schemas/CCTVStatusReading"},
+                {"$ref": "#/components/schemas/ImpactVibrationReading"},
+                {"$ref": "#/components/schemas/LocationReading"}
+              ]
+            }
+          },
+          "next_cursor": {"type": "string", "nullable": true}
+        }
+      }
+    }
+  }
+}

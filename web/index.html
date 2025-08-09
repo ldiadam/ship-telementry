@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vessel Telemetry System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="modern-readable.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="modern-header">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-ship text-3xl"></i>
+                    <div>
+                        <h1>Vessel Telemetry System</h1>
+                        <p>Maritime Data Management Platform</p>
+                    </div>
+                </div>
+                <div class="hidden md:block text-right">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm">
+                            <div>Real-time vessel monitoring</div>
+                            <div>IMO-compliant data processing</div>
+                        </div>
+                        <a href="dashboard.html" class="modern-button-secondary">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-10 max-w-7xl">
+        <!-- Upload Section -->
+        <div class="modern-card modern-section">
+            <div class="mb-6">
+                <h2 class="flex items-center mb-3">
+                    <i class="fas fa-upload mr-3 text-blue-600"></i>
+                    Upload Telemetry Data
+                </h2>
+                <p>Upload XLSX files containing vessel telemetry data for processing and analysis.</p>
+            </div>
+            
+            <form id="uploadForm" class="modern-grid">
+                <div class="modern-grid modern-grid-2">
+                    <div>
+                        <label class="modern-label">
+                            <i class="fas fa-id-card mr-2 text-blue-600"></i>
+                            IMO Number (Preferred)
+                        </label>
+                        <input type="text" id="imo" placeholder="e.g., 9799707" class="modern-input w-full">
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                            7-digit international maritime identifier (most reliable)
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="modern-label">
+                            <i class="fas fa-ship mr-2 text-blue-600"></i>
+                            Vessel Name (Fallback)
+                        </label>
+                        <input type="text" id="vesselName" placeholder="e.g., MV Sea Voyager" class="modern-input w-full">
+                        <p class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                            Required only if IMO number is unknown
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="modern-label">
+                        <i class="fas fa-clock mr-2 text-blue-600"></i>
+                        Period Start Time (Optional)
+                    </label>
+                    <input type="datetime-local" id="periodStart" class="modern-input w-full">
+                    <p class="text-sm text-gray-600 mt-2">
+                        <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                        Timestamp for batch processing (defaults to current upload time)
+                    </p>
+                </div>
+
+                <div>
+                    <label class="modern-label">
+                        <i class="fas fa-file-excel mr-2 text-green-600"></i>
+                        Excel Telemetry File
+                    </label>
+                    <div class="modern-upload" id="dropZone">
+                        <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-lg font-medium mb-2">Click to select or drag & drop XLSX file</p>
+                        <p class="text-sm text-gray-500">
+                            Supports Excel files with multiple sheets:<br>
+                            Ship Info, Engines, Fuel Tanks, Generators, CCTV, Impact & Vibration
+                        </p>
+                        <div id="fileInfo" class="hidden mt-4 modern-alert-success">
+                            <p class="font-medium"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="uploadBtn" class="modern-button w-full">
+                    <i class="fas fa-upload mr-2"></i>
+                    Upload & Process Telemetry Data
+                </button>
+            </form>
+
+            <!-- Upload Progress -->
+            <div id="uploadProgress" class="hidden mt-4">
+                <div class="bg-gray-200 rounded-full h-2">
+                    <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p class="text-sm text-gray-600 mt-2">Uploading and processing...</p>
+            </div>
+
+            <!-- Upload Result -->
+            <div id="uploadResult" class="hidden mt-4"></div>
+        </div>
+
+        <!-- Vessels List -->
+        <div class="modern-card modern-section">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="flex items-center mb-3">
+                        <i class="fas fa-list mr-3 text-blue-600"></i>
+                        Registered Vessels
+                    </h2>
+                    <p>View and select vessels to access their telemetry data.</p>
+                </div>
+                <button id="refreshVessels" class="modern-button-secondary">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Refresh List
+                </button>
+            </div>
+            
+            <div id="vesselsList" class="space-y-4">
+                <div class="text-center py-12">
+                    <i class="fas fa-ship text-6xl mb-4 text-gray-400"></i>
+                    <p class="text-lg font-medium mb-2">Loading vessels...</p>
+                    <p class="text-sm">Please wait while we fetch the vessel data</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Telemetry Data -->
+        <div id="telemetrySection" class="hidden modern-card modern-section">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-6 space-y-4 lg:space-y-0">
+                <div>
+                    <h2 class="flex items-center mb-3">
+                        <i class="fas fa-chart-line mr-3 text-blue-600"></i>
+                        Telemetry Data
+                    </h2>
+                    <p>View real-time and historical telemetry data for the selected vessel.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                    <select id="streamSelect" class="modern-input">
+                        <option value="">Select Data Stream</option>
+                        <option value="location">📍 Location & Navigation</option>
+                        <option value="engines">⚙️ Engine Performance</option>
+                        <option value="fuel">⛽ Fuel Tank Status</option>
+                        <option value="generators">🔌 Generator Output</option>
+                        <option value="cctv">📹 CCTV Systems</option>
+                        <option value="impact">📊 Impact & Vibration</option>
+                    </select>
+                    <button id="loadTelemetry" class="modern-button">
+                        <i class="fas fa-download mr-2"></i>
+                        Load Data
+                    </button>
+                </div>
+            </div>
+            
+            <div id="telemetryData" class="bg-gray-50 rounded-lg p-6">
+                <div class="text-center py-8">
+                    <i class="fas fa-chart-bar text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-lg font-medium mb-2">Select a data stream to view telemetry</p>
+                    <p class="text-sm">Choose from location, engines, fuel, generators, CCTV, or impact data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/xuri/excelize/v2"
+)
+
+func main() {
+	// Create a sample XLSX file for testing
+	f := excelize.NewFile()
+	defer f.Close()
+
+	// Ship Info sheet
+	f.NewSheet("Ship Info")
+	f.SetCellValue("Ship Info", "A1", "Name")
+	f.SetCellValue("Ship Info", "B1", "IMO")
+	f.SetCellValue("Ship Info", "C1", "Flag")
+	f.SetCellValue("Ship Info", "D1", "Type")
+	f.SetCellValue("Ship Info", "A2", "Ever Given")
+	f.SetCellValue("Ship Info", "B2", "9811000")
+	f.SetCellValue("Ship Info", "C2", "Panama")
+	f.SetCellValue("Ship Info", "D2", "Container Ship")
+
+	// Engines sheet
+	f.NewSheet("Engines")
+	f.SetCellValue("Engines", "A1", "Timestamp")
+	f.SetCellValue("Engines", "B1", "Engine No")
+	f.SetCellValue("Engines", "C1", "RPM")
+	f.SetCellValue("Engines", "D1", "Temperature C")
+	f.SetCellValue("Engines", "E1", "Oil Pressure Bar")
+	f.SetCellValue("Engines", "F1", "Alarms")
+	f.SetCellValue("Engines", "G1", "Custom Field")
+
+	// Sample engine data
+	f.SetCellValue("Engines", "A2", "2025-08-08T10:00:00Z")
+	f.SetCellValue("Engines", "B2", 1)
+	f.SetCellValue("Engines", "C2", 1500)
+	f.SetCellValue("Engines", "D2", 85.5)
+	f.SetCellValue("Engines", "E2", 4.2)
+	f.SetCellValue("Engines", "F2", "OK")
+	f.SetCellValue("Engines", "G2", "Custom Value 1")
+
+	f.SetCellValue("Engines", "A3", "2025-08-08T10:30:00Z")
+	f.SetCellValue("Engines", "B3", 1)
+	f.SetCellValue("Engines", "C3", 1600)
+	f.SetCellValue("Engines", "D3", 87.2)
+	f.SetCellValue("Engines", "E3", 4.5)
+	f.SetCellValue("Engines", "F3", "OK")
+	f.SetCellValue("Engines", "G3", "Custom Value 2")
+
+	// Fuel Tanks sheet
+	f.NewSheet("Fuel Tanks")
+	f.SetCellValue("Fuel Tanks", "A1", "Timestamp")
+	f.SetCellValue("Fuel Tanks", "B1", "Tank No")
+	f.SetCellValue("Fuel Tanks", "C1", "Level %")
+	f.SetCellValue("Fuel Tanks", "D1", "Volume Liters")
+	f.SetCellValue("Fuel Tanks", "E1", "Temperature C")
+
+	f.SetCellValue("Fuel Tanks", "A2", "2025-08-08T10:00:00Z")
+	f.SetCellValue("Fuel Tanks", "B2", 1)
+	f.SetCellValue("Fuel Tanks", "C2", 75.5)
+	f.SetCellValue("Fuel Tanks", "D2", 15000)
+	f.SetCellValue("Fuel Tanks", "E2", 25.0)
+
+	// Delete default sheet
+	f.DeleteSheet("Sheet1")
+
+	// Save the file
+	if err := f.SaveAs("sample_telemetry.xlsx"); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("✓ Sample XLSX file created: sample_telemetry.xlsx")
+	fmt.Println("You can test the API with:")
+	fmt.Println(`curl -F "file=@sample_telemetry.xlsx" "http://localhost:8080/ingest/xlsx?vessel_name=Ever Given"`)
+}

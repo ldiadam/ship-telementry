@@ -1,0 +1,145 @@
+/* HIGH CONTRAST CSS - MAXIMUM READABILITY */
+
+/* Force everything to high contrast */
+* {
+    color: #000000 !important;
+    background-color: transparent !important;
+}
+
+/* Page background */
+body, html {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    font-weight: 500 !important;
+}
+
+/* Headers - pure black, bold */
+h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    font-weight: 700 !important;
+    background-color: transparent !important;
+}
+
+/* All text elements */
+p, span, div, label, td, th, li, a {
+    color: #000000 !important;
+    background-color: transparent !important;
+    font-weight: 500 !important;
+}
+
+/* White backgrounds for cards and sections */
+.bg-white, .bg-gray-50, .bg-gray-100, .bg-blue-50 {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+/* Blue header stays blue but with white text */
+.bg-blue-900 {
+    background-color: #0066cc !important;
+    color: #ffffff !important;
+}
+
+.bg-blue-900 * {
+    color: #ffffff !important;
+}
+
+/* Buttons - high contrast */
+button {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    font-weight: 700 !important;
+    padding: 12px 24px !important;
+    font-size: 16px !important;
+}
+
+button:hover {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+}
+
+/* Form inputs - black border, white background, black text */
+input, select, textarea {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    padding: 12px !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #0066cc !important;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3) !important;
+}
+
+/* Placeholders */
+input::placeholder {
+    color: #666666 !important;
+    font-weight: 500 !important;
+}
+
+/* Tables - maximum contrast */
+table {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+th {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    padding: 12px !important;
+}
+
+td {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    padding: 12px !important;
+}
+
+/* Links */
+a {
+    color: #0066cc !important;
+    font-weight: 600 !important;
+    text-decoration: underline !important;
+}
+
+/* Icons stay visible */
+i {
+    color: #0066cc !important;
+}
+
+/* Override any remaining gray text */
+.text-gray-900, .text-gray-800, .text-gray-700, .text-gray-600, 
+.text-gray-500, .text-gray-400, .text-gray-300, .text-gray-200 {
+    color: #000000 !important;
+}
+
+/* Success/error messages */
+.bg-green-50 {
+    background-color: #e6ffe6 !important;
+    border: 2px solid #00cc00 !important;
+}
+
+.bg-red-50 {
+    background-color: #ffe6e6 !important;
+    border: 2px solid #cc0000 !important;
+}
+
+.text-green-600, .text-green-700, .text-green-800 {
+    color: #006600 !important;
+    font-weight: 700 !important;
+}
+
+.text-red-600, .text-red-700, .text-red-800 {
+    color: #cc0000 !important;
+    font-weight: 700 !important;
+}

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vessel Telemetry Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="modern-readable.css" rel="stylesheet">
+    <style>
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        
+        .dashboard-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        #map {
+            height: 400px;
+            border-radius: 8px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: #10b981; }
+        .status-warning { background-color: #f59e0b; }
+        .status-offline { background-color: #ef4444; }
+        
+        .vessel-selector {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 16px;
+            color: #1a202c;
+            min-width: 200px;
+        }
+        
+        .dashboard-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 0;
+            margin-bottom: 24px;
+        }
+        
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: #f7fafc;
+            color: #2d3748;
+        }
+        
+        .nav-link.active {
+            background: #3182ce;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="modern-header">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-chart-line text-3xl"></i>
+                    <div>
+                        <h1>Vessel Telemetry Dashboard</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <select id="vesselSelector" class="vessel-selector">
+                        <option value="">Select Vessel</option>
+                    </select>
+                    <a href="index.html" class="modern-button-secondary">
+                        <i class="fas fa-upload mr-2"></i>
+                        Upload Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <div class="dashboard-nav">
+        <div class="container mx-auto px-6">
+            <div class="flex space-x-4">
+                <a href="#overview" class="nav-link active" data-tab="overview">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Overview
+                </a>
+                <a href="#location" class="nav-link" data-tab="location">
+                    <i class="fas fa-map-marker-alt mr-2"></i>Location & Track
+                </a>
+                <a href="#performance" class="nav-link" data-tab="performance">
+                    <i class="fas fa-chart-bar mr-2"></i>Performance
+                </a>
+                <a href="#systems" class="nav-link" data-tab="systems">
+                    <i class="fas fa-cogs mr-2"></i>Systems Status
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 pb-8">
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content">
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="metric-card">
+                    <div class="metric-value" id="currentSpeed">--</div>
+                    <div class="metric-label">Current Speed (knots)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="engineRPM">--</div>
+                    <div class="metric-label">Engine RPM</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="fuelLevel">--</div>
+                    <div class="metric-label">Fuel Level (%)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="systemsOnline">--</div>
+                    <div class="metric-label">Systems Online</div>
+                </div>
+            </div>
+
+            <!-- Dynamic Engine Charts Container -->
+            <div id="engineChartsContainer" class="mb-8">
+                <!-- Engine charts will be dynamically created here -->
+            </div>
+
+            <!-- Fuel Chart -->
+            <div class="dashboard-card p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-gas-pump mr-2 text-green-600"></i>
+                    Fuel Consumption (24h)
+                </h3>
+                <div class="chart-container">
+                    <canvas id="fuelChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Engine Status -->
+            <div class="dashboard-card p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-cogs mr-2 text-blue-600"></i>
+                    Engine Status
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="engineStatus">
+                    <!-- Engine status items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Status Overview -->
+            <div class="dashboard-card p-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-list-check mr-2 text-purple-600"></i>
+                    System Status Overview
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="systemStatus">
+                    <!-- System status items will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Location Tab -->
+        <div id="location-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Map -->
+                <div class="lg:col-span-2">
+                    <div class="dashboard-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">
+                                <i class="fas fa-map mr-2 text-blue-600"></i>
+                                Vessel Location & Track
+                            </h3>
+                            <div class="flex space-x-2">
+                                <button id="showTrack" class="modern-button-secondary text-sm">
+                                    <i class="fas fa-route mr-1"></i>Show Track
+                                </button>
+                                <button id="centerMap" class="modern-button-secondary text-sm">
+                                    <i class="fas fa-crosshairs mr-1"></i>Center
+                                </button>
+                            </div>
+                        </div>
+                        <div id="map"></div>
+                    </div>
+                </div>
+
+                <!-- Location Info -->
+                <div class="space-y-6">
+                    <div class="dashboard-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">
+                            <i class="fas fa-location-dot mr-2 text-red-600"></i>
+                            Current Position
+                        </h3>
+                        <div class="space-y-3" id="currentPosition">
+                            <div class="flex justify-between">
+                                <span class="font-medium">Latitude:</span>
+                                <span id="currentLat">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium">Longitude:</span>
+                                <span id="currentLon">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium">Course:</span>
+                                <span id="currentCourse">--°</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium">Speed:</span>
+                                <span id="currentSpeedDetail">-- knots</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium">Status:</span>
+                                <span id="currentStatus">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">
+                            <i class="fas fa-clock mr-2 text-green-600"></i>
+                            Location History
+                        </h3>
+                        <div class="space-y-2" id="locationHistory">
+                            <!-- Location history items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Tab -->
+        <div id="performance-tab" class="tab-content hidden">
+            <!-- Dynamic Generator Charts Container -->
+            <div id="generatorChartsContainer" class="mb-6">
+                <!-- Generator charts will be dynamically created here -->
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="dashboard-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                        <i class="fas fa-thermometer-half mr-2 text-red-600"></i>
+                        Temperature Monitoring
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                        <i class="fas fa-tachometer-alt mr-2 text-blue-600"></i>
+                        System Metrics
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="systemMetricsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card p-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-wave-square mr-2 text-purple-600"></i>
+                    Vibration & Impact Analysis
+                </h3>
+                <div class="chart-container">
+                    <canvas id="vibrationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Systems Tab -->
+        <div id="systems-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="dashboard-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                        <i class="fas fa-video mr-2 text-blue-600"></i>
+                        CCTV System Status
+                    </h3>
+                    <div id="cctvStatus" class="space-y-3">
+                        <!-- CCTV status items will be populated here -->
+                    </div>
+                </div>
+
+                <div class="dashboard-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                        <i class="fas fa-exclamation-triangle mr-2 text-orange-600"></i>
+                        Recent Alerts & Warnings
+                    </h3>
+                    <div id="alertsList" class="space-y-3">
+                        <!-- Alerts will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-chart-pie mr-2 text-green-600"></i>
+                    System Health Overview
+                </h3>
+                <div class="chart-container">
+                    <canvas id="systemHealthChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

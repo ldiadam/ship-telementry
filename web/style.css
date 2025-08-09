@@ -1,0 +1,508 @@
+/* Custom styles for the vessel telemetry system */
+
+/* OVERRIDE ALL TAILWIND GRAY COLORS FOR HIGH CONTRAST */
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-gray-500,
+.text-gray-400,
+.text-gray-300 {
+    color: #000000 !important;
+    /* Force all gray text to pure black */
+}
+
+.bg-gray-50,
+.bg-gray-100,
+.bg-gray-200 {
+    background-color: #ffffff !important;
+    /* Force all gray backgrounds to white */
+    border: 1px solid #000000 !important;
+    /* Add black border for definition */
+}
+
+.border-gray-300,
+.border-gray-200,
+.border-gray-100 {
+    border-color: #000000 !important;
+    /* Force all gray borders to black */
+}
+
+/* Override specific problematic classes */
+.bg-blue-50 {
+    background-color: #e6f3ff !important;
+    /* Light blue with better contrast */
+}
+
+.text-blue-200 {
+    color: #ffffff !important;
+    /* White text on blue backgrounds */
+}
+
+.text-blue-600,
+.text-blue-500 {
+    color: #0066cc !important;
+    /* Darker blue for better contrast */
+}
+
+/* Fix card and section backgrounds */
+.bg-white {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+/* FIXED: High contrast typography for excellent readability */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #000000 !important;
+    /* Pure black for maximum contrast */
+    background-color: #ffffff !important;
+    /* Pure white background */
+}
+
+/* Override the body background class from HTML */
+.bg-gray-50 {
+    background-color: #ffffff !important;
+    /* Force white background */
+}
+
+/* High contrast headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #000000 !important;
+    /* Pure black */
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* High contrast body text */
+p,
+span,
+div {
+    color: #000000 !important;
+    /* Pure black */
+    line-height: 1.6;
+}
+
+/* High contrast labels */
+label {
+    color: #000000 !important;
+    /* Pure black */
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* High contrast inputs */
+input,
+select,
+textarea {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    color: #000000 !important;
+    /* Pure black text */
+    background-color: #ffffff !important;
+    /* Pure white background */
+    border: 2px solid #000000 !important;
+    /* Black border */
+    border-radius: 0.5rem !important;
+    padding: 0.75rem !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #0066cc !important;
+    /* Blue focus border */
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3) !important;
+    outline: none !important;
+}
+
+/* High contrast placeholder text */
+input::placeholder {
+    color: #666666 !important;
+    /* Dark gray for visibility */
+    opacity: 1 !important;
+}
+
+/* High contrast buttons */
+button {
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease-in-out !important;
+    color: #ffffff !important;
+    /* White text on buttons */
+    background-color: #0066cc !important;
+    /* Blue background */
+    border: 2px solid #0066cc !important;
+}
+
+button:hover {
+    background-color: #0052a3 !important;
+    /* Darker blue on hover */
+    border-color: #0052a3 !important;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* File drop zone animations */
+.drop-zone-active {
+    transform: scale(1.02);
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+}
+
+/* Improved vessel card styling */
+.vessel-card {
+    transition: all 0.3s ease;
+    border: 2px solid #e5e7eb;
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+}
+
+.vessel-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6;
+}
+
+.vessel-card.selected {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+/* HIGH CONTRAST vessel card content */
+.vessel-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #000000 !important;
+    /* Pure black */
+    margin-bottom: 0.5rem;
+}
+
+.vessel-card .vessel-details {
+    font-size: 1rem;
+    color: #000000 !important;
+    /* Pure black */
+    line-height: 1.5;
+}
+
+.vessel-card .vessel-details strong {
+    color: #000000 !important;
+    /* Pure black */
+    font-weight: 700;
+}
+
+.vessel-card .latest-data {
+    font-size: 1rem;
+    color: #000000 !important;
+    /* Pure black */
+}
+
+.vessel-card .latest-data strong {
+    color: #000000 !important;
+    /* Pure black */
+    font-weight: 700;
+}
+
+/* Loading animations */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Progress bar animation */
+.progress-bar {
+    transition: width 0.3s ease-in-out;
+}
+
+/* HIGH CONTRAST table styling */
+.telemetry-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.telemetry-table th {
+    position: sticky;
+    top: 0;
+    background: #ffffff !important;
+    /* White background */
+    z-index: 10;
+    font-weight: 700;
+    color: #000000 !important;
+    /* Pure black text */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 3px solid #000000 !important;
+    /* Black border */
+}
+
+.telemetry-table td {
+    padding: 1rem 1.5rem;
+    color: #000000 !important;
+    /* Pure black text */
+    font-weight: 500;
+    border-bottom: 1px solid #000000 !important;
+    /* Black border */
+    vertical-align: middle;
+    background-color: #ffffff !important;
+    /* White background */
+}
+
+.telemetry-table tr:hover {
+    background-color: #eff6ff;
+    transform: scale(1.001);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.telemetry-table tbody tr:nth-child(even) {
+    background-color: #fafbfc;
+}
+
+.telemetry-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+/* Better spacing for upload progress and results */
+#uploadProgress {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+
+#uploadResult {
+    margin-top: 1.5rem;
+}
+
+#uploadResult .bg-green-50 {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid #10b981;
+}
+
+#uploadResult .bg-red-50 {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid #ef4444;
+}
+
+/* Improved loading states */
+.loading-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid #e5e7eb;
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Status indicators */
+.status-online {
+    color: #10b981;
+}
+
+.status-offline {
+    color: #ef4444;
+}
+
+.status-warning {
+    color: #f59e0b;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .vessel-card {
+        padding: 1rem;
+    }
+
+    .vessel-card .flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .telemetry-table {
+        font-size: 0.875rem;
+    }
+
+    .telemetry-table th,
+    .telemetry-table td {
+        padding: 0.5rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .bg-white {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+
+    .border-gray-200 {
+        border-color: #374151;
+    }
+
+    .text-gray-900 {
+        color: #f9fafb;
+    }
+
+    .text-gray-600 {
+        color: #d1d5db;
+    }
+
+    .text-gray-500 {
+        color: #9ca3af;
+    }
+}
+
+/* Custom animations for success/error messages */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
+}
+
+/* Data visualization enhancements */
+.data-point {
+    transition: all 0.2s ease;
+}
+
+.data-point:hover {
+    transform: scale(1.1);
+}
+
+/* Loading skeleton */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
