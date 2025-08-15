@@ -1,7 +1,7 @@
 // Dashboard JavaScript - Interactive Charts, Maps, and Data Visualization
 
 // API Base URL
-const API_BASE = 'http://localhost:31180s';
+const API_BASE = 'http://localhost:31180';
 
 // Global variables
 let selectedVesselId = null;
