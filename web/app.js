@@ -1,5 +1,5 @@
 // API Base URL
-const API_BASE = 'http://localhost:8080';
+const API_BASE = 'http://localhost:31180';
 
 // Global state
 let selectedVesselId = null;
